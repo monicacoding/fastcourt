@@ -17,9 +17,10 @@ const BEEP_SOUND = "/sound/beep.mp3"
 // Image paths with absolute URLs
 const COLOR_MODE_ICON = "/images/color-mode.png"
 const REACTION_MODE_ICON = "/images/reaction-mode.png"
+const ENDURANCE_MODE_ICON = "/images/endurance-mode.png"
 
 type TrainingState = "setup" | "countdown" | "training" | "rest"
-type TrainingMode = "color" | "reaction"
+type TrainingMode = "color" | "reaction" | "endurance"
 type ArrowDirection = "left" | "right"
 type ArrowColor = "red" | "green"
 
@@ -28,7 +29,7 @@ interface TrainingDrill {
   id: string
   title: string
   mode: TrainingMode
-  interval: string
+  interval?: string // Optional for endurance mode
   duration: string
   rest: string
   sets: string
@@ -48,11 +49,11 @@ const PREDEFINED_DRILLS: TrainingDrill[] = [
     },
     {
       id: "court-agility",
-      title: "Court Agility",
+      title: "Baseline Court Agility",
       mode: "color",
       interval: "2.5",
       duration: "30",
-      rest: "30",
+      rest: "25",
       sets: "3",
     },
     {
@@ -61,43 +62,25 @@ const PREDEFINED_DRILLS: TrainingDrill[] = [
       mode: "color",
       interval: "3.5",
       duration: "30",
-      rest: "30",
-      sets: "3",
-    },
-    {
-      id: "hurdle-jump-court-agility",
-      title: "Hurdle Jump & Court Agility",
-      mode: "color",
-      interval: "4.5",
-      duration: "30",
-      rest: "30",
+      rest: "25",
       sets: "3",
     },
     {
       id: "lateral-court-agility",
-      title: "Lateral Court Agility",
+      title: "Baseline Lateral Reaction",
       mode: "reaction",
       interval: "3.5",
       duration: "30",
-      rest: "30",
+      rest: "25",
       sets: "3",
     },
-    {
-        id: "hurdle-jump-lateral-agility",
-        title: "Hurdle Jump & Lateral Agility",
-        mode: "reaction",
-        interval: "4.5",
-        duration: "30",
-        rest: "30",
-        sets: "3",
-      },
     {
       id: "sprints-backpedal",
       title: "Sprints & Backpedal",
       mode: "reaction",
       interval: "3.5",
       duration: "30",
-      rest: "30",
+      rest: "25",
       sets: "3",
     },
     {
@@ -106,7 +89,16 @@ const PREDEFINED_DRILLS: TrainingDrill[] = [
       mode: "reaction",
       interval: "2",
       duration: "30",
-      rest: "30",
+      rest: "25",
+      sets: "3",
+    },
+    {
+      id: "figure-8-drill",
+      title: "Figure 8's & Lateral Reaction",
+      mode: "reaction",
+      interval: "4.5",
+      duration: "30",
+      rest: "25",
       sets: "3",
     },
     {
@@ -115,7 +107,7 @@ const PREDEFINED_DRILLS: TrainingDrill[] = [
       mode: "color",
       interval: "3",
       duration: "30",
-      rest: "30",
+      rest: "25",
       sets: "3",
     },
     {
@@ -124,7 +116,47 @@ const PREDEFINED_DRILLS: TrainingDrill[] = [
       mode: "reaction",
       interval: "2",
       duration: "30",
-      rest: "30",
+      rest: "25",
+      sets: "3",
+    },
+    {
+      id: "hurdle-jump-fh-bh-endurance",
+      title: "Hurdle Jump & FH/BH Endurance",
+      mode: "endurance",
+      duration: "30",
+      rest: "25",
+      sets: "3",
+    },
+    {
+      id: "forward-backward-fh-endurance",
+      title: "Forward/Backward FH Endurance",
+      mode: "endurance",
+      duration: "30",
+      rest: "25",
+      sets: "3",
+    },
+    {
+      id: "forward-backward-bh-endurance",
+      title: "Forward/Backward BH Endurance",
+      mode: "endurance",
+      duration: "30",
+      rest: "25",
+      sets: "3",
+    },
+    {
+      id: "fh-bh-hurdle-crossover-endurance",
+      title: "FH/BH Hurdle Crossover Endurance",
+      mode: "endurance",
+      duration: "30",
+      rest: "25",
+      sets: "3",
+    },
+    {
+      id: "triple-hurdle-lateral-jumps-fh-bh-endurance",
+      title: "Triple Hurdle Lateral Jumps + FH/BH Endurance",
+      mode: "endurance",
+      duration: "30",
+      rest: "25",
       sets: "3",
     },
   ]
@@ -150,6 +182,7 @@ export default function RacketTrainingApp() {
   // State for image loading errors
   const [colorModeIconError, setColorModeIconError] = useState(false)
   const [reactionModeIconError, setReactionModeIconError] = useState(false)
+  const [enduranceModeIconError, setEnduranceModeIconError] = useState(false)
 
   // State for training session
   const [trainingState, setTrainingState] = useState<TrainingState>("setup")
@@ -298,7 +331,10 @@ export default function RacketTrainingApp() {
     // Only update parameters if not in custom mode or if switching to a predefined drill
     if (selectedDrillId !== "custom") {
       setTrainingMode(drill.mode)
-      setIntervalTime(drill.interval)
+      // Only set interval time if the drill has one (not for endurance mode)
+      if (drill.interval) {
+        setIntervalTime(drill.interval)
+      }
       setRoundDuration(drill.duration)
       setRestTime(drill.rest)
       setNumSets(drill.sets)
@@ -428,17 +464,22 @@ export default function RacketTrainingApp() {
     // Initialize based on selected mode
     if (trainingModeRef.current === "color") {
       setCurrentColor(getRandomColor())
-    } else {
+    } else if (trainingModeRef.current === "reaction") {
       setCurrentColor(COLORS.darkGray)
       const newArrow = getRandomArrow()
       setArrowDirection(newArrow.direction)
       setArrowColor(newArrow.color)
+    } else {
+      // endurance mode - keep background dark gray, no stimulus changes
+      setCurrentColor(COLORS.darkGray)
     }
 
     logTransition(`Starting training session - Set 1 - Mode: ${trainingModeRef.current}`)
 
-    // Start stimulus changes
-    startStimulusChanges()
+    // Start stimulus changes (only for color and reaction modes)
+    if (trainingModeRef.current !== "endurance") {
+      startStimulusChanges()
+    }
 
     // Start countdown timer
     startCountdownTimer()
@@ -446,6 +487,11 @@ export default function RacketTrainingApp() {
 
   // Start stimulus changes (color or arrow) based on selected mode
   const startStimulusChanges = () => {
+    // Don't start stimulus changes for endurance mode
+    if (trainingModeRef.current === "endurance") {
+      return
+    }
+
     // Clear any existing interval
     if (colorIntervalRef.current) {
       clearTimeout(colorIntervalRef.current)
@@ -453,17 +499,17 @@ export default function RacketTrainingApp() {
 
     // Function to schedule the next stimulus change
     const scheduleNextChange = () => {
-      if (trainingStateRef.current === "training") {
+      if (trainingStateRef.current === "training" && trainingModeRef.current !== "endurance") {
         // Get a randomized interval if enabled, otherwise use the fixed interval
         const intervalDuration = getRandomizedInterval()
 
         // Schedule the next change
         colorIntervalRef.current = setTimeout(() => {
-          if (trainingStateRef.current === "training") {
+          if (trainingStateRef.current === "training" && trainingModeRef.current !== "endurance") {
             if (trainingModeRef.current === "color") {
               // Color mode: change background color
               setCurrentColor(getRandomColor())
-            } else {
+            } else if (trainingModeRef.current === "reaction") {
               // Reaction mode: change arrow
               const newArrow = getRandomArrow()
               setArrowDirection(newArrow.direction)
@@ -498,9 +544,9 @@ export default function RacketTrainingApp() {
           setIsTransitioning(true)
 
           const currentTrainingState = trainingStateRef.current
-          const currentSetNumber = currentSetRef.current
-          const maxSets = Number.parseInt(numSetsRef.current)
-          const restTimeDuration = Number.parseInt(restTimeRef.current)
+          const currentSetNumber = Number(currentSetRef.current)
+          const maxSets = Number.parseInt(numSetsRef.current, 10)
+          const restTimeDuration = Number.parseInt(restTimeRef.current, 10)
 
           setTimeout(() => {
             // Handle different state transitions
@@ -518,7 +564,15 @@ export default function RacketTrainingApp() {
               }
             } else if (currentTrainingState === "rest") {
               // Rest → Training or End
-              if (currentSetNumber < maxSets) {
+              // After rest, we've completed currentSetNumber training rounds
+              // We need maxSets training rounds total, so if currentSetNumber < maxSets, start next set
+              // Note: currentSetNumber represents the set that just finished resting
+              // We need to check if we've completed fewer training rounds than maxSets
+              // For 3 sets: after set 1 rest (currentSet=1, 1<3=true) → start set 2
+              //            after set 2 rest (currentSet=2, 2<3=true) → start set 3
+              //            after set 3 rest (currentSet=3, 3<3=false) → finish
+              const setsRemaining = maxSets - currentSetNumber
+              if (setsRemaining > 0) {
                 // If more sets remain, start next training set
                 startNextTrainingSet()
               } else {
@@ -592,17 +646,22 @@ export default function RacketTrainingApp() {
     // Initialize based on selected mode
     if (trainingModeRef.current === "color") {
       setCurrentColor(getRandomColor())
-    } else {
+    } else if (trainingModeRef.current === "reaction") {
       setCurrentColor(COLORS.darkGray)
       const newArrow = getRandomArrow()
       setArrowDirection(newArrow.direction)
       setArrowColor(newArrow.color)
+    } else {
+      // endurance mode - keep background dark gray, no stimulus changes
+      setCurrentColor(COLORS.darkGray)
     }
 
     setTimeRemaining(Number.parseInt(roundDurationRef.current))
 
-    // Restart stimulus changes
-    startStimulusChanges()
+    // Restart stimulus changes (only for color and reaction modes)
+    if (trainingModeRef.current !== "endurance") {
+      startStimulusChanges()
+    }
 
     logTransition(`Starting training set ${newSetNumber}`)
   }
@@ -695,7 +754,7 @@ export default function RacketTrainingApp() {
           onError={() => setColorModeIconError(true)}
         />
       )
-    } else {
+    } else if (mode === "reaction") {
       return reactionModeIconError ? (
         <span className="inline-block w-4 h-4 bg-purple-500 mr-1" aria-hidden />
       ) : (
@@ -706,6 +765,20 @@ export default function RacketTrainingApp() {
           height={16}
           className="inline-block mr-1 align-[-2px]"
           onError={() => setReactionModeIconError(true)}
+        />
+      )
+    } else {
+      // endurance mode
+      return enduranceModeIconError ? (
+        <span className="inline-block w-4 h-4 bg-orange-500 mr-1" aria-hidden />
+      ) : (
+        <img
+          src={ENDURANCE_MODE_ICON}
+          alt="Endurance Mode"
+          width={16}
+          height={16}
+          className="inline-block mr-1 align-[-2px]"
+          onError={() => setEnduranceModeIconError(true)}
         />
       )
     }
@@ -726,10 +799,12 @@ export default function RacketTrainingApp() {
   }
 
   const isActive = trainingState !== "setup"
+  // For endurance mode, always use dark gray background (no color changes)
+  const backgroundColor = isActive && trainingMode !== "endurance" ? currentColor : COLORS.darkGray
   return (
     <div
       className="flex flex-col items-center justify-center min-h-screen w-full p-6 sm:p-8 transition-colors duration-300"
-      style={isActive ? { backgroundColor: currentColor } : undefined}
+      style={isActive ? { backgroundColor } : undefined}
     >
       <div className="container-card">
         {trainingState !== "setup" && <div className="text-xl font-bold text-center mb-4">{selectedDrill.title}</div>}
@@ -776,62 +851,81 @@ export default function RacketTrainingApp() {
                 <label className="text-sm font-medium flex-1">Training Mode</label>
                 <span className="text-xs text-muted-foreground">{selectedDrillId !== "custom" && "Preset"}</span>
               </div>
-              <div className="flex space-x-6">
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    name="mode"
-                    value="color"
-                    checked={trainingMode === "color"}
-                    onChange={(e) => handleParameterChange("mode", e.target.value)}
-                    disabled={selectedDrillId !== "custom"}
-                  />
-                  <span className="flex items-center">{renderModeIcon("color")} Color Mode</span>
-                </label>
-                <label className="flex items-center space-x-2">
-                  <input
-                    type="radio"
-                    name="mode"
-                    value="reaction"
-                    checked={trainingMode === "reaction"}
-                    onChange={(e) => handleParameterChange("mode", e.target.value)}
-                    disabled={selectedDrillId !== "custom"}
-                  />
-                  <span className="flex items-center">{renderModeIcon("reaction")} Reaction Mode</span>
-                </label>
-              </div>
+              {selectedDrillId === "custom" ? (
+                <div className="flex flex-wrap gap-4">
+                  <label className="flex items-center space-x-2 whitespace-nowrap">
+                    <input
+                      type="radio"
+                      name="mode"
+                      value="color"
+                      checked={trainingMode === "color"}
+                      onChange={(e) => handleParameterChange("mode", e.target.value)}
+                    />
+                    <span className="flex items-center gap-1.5 text-sm">{renderModeIcon("color")} Color</span>
+                  </label>
+                  <label className="flex items-center space-x-2 whitespace-nowrap">
+                    <input
+                      type="radio"
+                      name="mode"
+                      value="reaction"
+                      checked={trainingMode === "reaction"}
+                      onChange={(e) => handleParameterChange("mode", e.target.value)}
+                    />
+                    <span className="flex items-center gap-1.5 text-sm">{renderModeIcon("reaction")} Reaction</span>
+                  </label>
+                  <label className="flex items-center space-x-2 whitespace-nowrap">
+                    <input
+                      type="radio"
+                      name="mode"
+                      value="endurance"
+                      checked={trainingMode === "endurance"}
+                      onChange={(e) => handleParameterChange("mode", e.target.value)}
+                    />
+                    <span className="flex items-center gap-1.5 text-sm">{renderModeIcon("endurance")} Endurance</span>
+                  </label>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  {renderModeIcon(trainingMode)}
+                  <span className="text-sm">
+                    {trainingMode === "color" ? "Color" : trainingMode === "reaction" ? "Reaction" : "Endurance"}
+                  </span>
+                </div>
+              )}
             </div>
 
-            <div className="space-y-2">
-              <div className="flex items-center">
-              <label className="section-label">Interval Time (seconds)</label>
-                <span className="text-xs text-muted-foreground">{selectedDrillId !== "custom" && "Preset"}</span>
-              </div>
-              <select
-                className="select"
-                value={intervalTime}
-                onChange={(e) => handleParameterChange("interval", e.target.value)}
-                disabled={selectedDrillId !== "custom"}
-              >
-                {intervalOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option}s
-                  </option>
-                ))}
-              </select>
+            {trainingMode !== "endurance" && (
+              <div className="space-y-2">
+                <div className="flex items-center">
+                <label className="section-label">Interval Time (seconds)</label>
+                  <span className="text-xs text-muted-foreground">{selectedDrillId !== "custom" && "Preset"}</span>
+                </div>
+                <select
+                  className="select"
+                  value={intervalTime}
+                  onChange={(e) => handleParameterChange("interval", e.target.value)}
+                  disabled={selectedDrillId !== "custom"}
+                >
+                  {intervalOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}s
+                    </option>
+                  ))}
+                </select>
 
-              <div className="flex items-center justify-between pt-1">
-                <label htmlFor="randomize-intervals" className="text-xs">
-                  Randomize Intervals (±0.75s)
-                </label>
-                <input
-                  id="randomize-intervals"
-                  type="checkbox"
-                  checked={randomizeIntervals}
-                  onChange={(e) => setRandomizeIntervals(e.target.checked)}
-                />
+                <div className="flex items-center justify-between pt-1">
+                  <label htmlFor="randomize-intervals" className="text-xs">
+                    Randomize Intervals (±0.75s)
+                  </label>
+                  <input
+                    id="randomize-intervals"
+                    type="checkbox"
+                    checked={randomizeIntervals}
+                    onChange={(e) => setRandomizeIntervals(e.target.checked)}
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="space-y-2">
               <div className="flex items-center">
@@ -908,6 +1002,12 @@ export default function RacketTrainingApp() {
                     {arrowDirection === "left" ? "←" : "→"}
                   </span>
                 </div>
+              </div>
+            )}
+
+            {trainingMode === "endurance" && (
+              <div className="flex flex-col items-center mb-4">
+                <div className="text-2xl font-semibold text-gray-700">ENDURANCE</div>
               </div>
             )}
 
