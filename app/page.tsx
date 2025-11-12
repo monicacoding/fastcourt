@@ -153,7 +153,7 @@ const PREDEFINED_DRILLS: TrainingDrill[] = [
     },
     {
       id: "triple-hurdle-lateral-jumps-fh-bh-endurance",
-      title: "Triple Hurdle Lateral Jumps + FH/BH Endurance",
+      title: "Triple Hurdle Lateral Jumps & FH/BH Endurance",
       mode: "endurance",
       duration: "30",
       rest: "25",
