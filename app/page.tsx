@@ -53,7 +53,7 @@ const PREDEFINED_DRILLS: TrainingDrill[] = [
       mode: "color",
       interval: "2.5",
       duration: "30",
-      rest: "25",
+      rest: "30",
       sets: "3",
     },
     {
@@ -62,7 +62,7 @@ const PREDEFINED_DRILLS: TrainingDrill[] = [
       mode: "color",
       interval: "3.5",
       duration: "30",
-      rest: "25",
+      rest: "30",
       sets: "3",
     },
     {
@@ -71,7 +71,7 @@ const PREDEFINED_DRILLS: TrainingDrill[] = [
       mode: "reaction",
       interval: "3.5",
       duration: "30",
-      rest: "25",
+      rest: "30",
       sets: "3",
     },
     {
@@ -80,7 +80,7 @@ const PREDEFINED_DRILLS: TrainingDrill[] = [
       mode: "reaction",
       interval: "3.5",
       duration: "30",
-      rest: "25",
+      rest: "30",
       sets: "3",
     },
     {
@@ -89,7 +89,7 @@ const PREDEFINED_DRILLS: TrainingDrill[] = [
       mode: "reaction",
       interval: "2",
       duration: "30",
-      rest: "25",
+      rest: "30",
       sets: "3",
     },
     {
@@ -98,7 +98,7 @@ const PREDEFINED_DRILLS: TrainingDrill[] = [
       mode: "reaction",
       interval: "4.5",
       duration: "30",
-      rest: "25",
+      rest: "30",
       sets: "3",
     },
     {
@@ -107,7 +107,7 @@ const PREDEFINED_DRILLS: TrainingDrill[] = [
       mode: "color",
       interval: "3",
       duration: "30",
-      rest: "25",
+      rest: "30",
       sets: "3",
     },
     {
@@ -116,7 +116,23 @@ const PREDEFINED_DRILLS: TrainingDrill[] = [
       mode: "reaction",
       interval: "2",
       duration: "30",
-      rest: "25",
+      rest: "30",
+      sets: "3",
+    },
+    {
+      id: "figure-8-endurance",
+      title: "Figure 8 Endurance",
+      mode: "endurance",
+      duration: "30",
+      rest: "30",
+      sets: "3",
+    },
+    {
+      id: "figure-8-explosive-endurance",
+      title: "Figure 8 & Explosive First Step",
+      mode: "endurance",
+      duration: "30",
+      rest: "30",
       sets: "3",
     },
     {
@@ -124,23 +140,7 @@ const PREDEFINED_DRILLS: TrainingDrill[] = [
       title: "Hurdle Jump & FH/BH Endurance",
       mode: "endurance",
       duration: "30",
-      rest: "25",
-      sets: "3",
-    },
-    {
-      id: "forward-backward-fh-endurance",
-      title: "Forward/Backward FH Endurance",
-      mode: "endurance",
-      duration: "30",
-      rest: "25",
-      sets: "3",
-    },
-    {
-      id: "forward-backward-bh-endurance",
-      title: "Forward/Backward BH Endurance",
-      mode: "endurance",
-      duration: "30",
-      rest: "25",
+      rest: "30",
       sets: "3",
     },
     {
@@ -148,7 +148,7 @@ const PREDEFINED_DRILLS: TrainingDrill[] = [
       title: "FH/BH Hurdle Crossover Endurance",
       mode: "endurance",
       duration: "30",
-      rest: "25",
+      rest: "30",
       sets: "3",
     },
     {
@@ -156,7 +156,7 @@ const PREDEFINED_DRILLS: TrainingDrill[] = [
       title: "Triple Hurdle Lateral Jumps & FH/BH Endurance",
       mode: "endurance",
       duration: "30",
-      rest: "25",
+      rest: "30",
       sets: "3",
     },
   ]
